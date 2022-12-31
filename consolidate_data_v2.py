@@ -1,7 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 import os
 import sys
 
@@ -14,6 +11,8 @@ dflist = []
 for n,sample in df.iterrows():
     valsf = sample['gem_file'].split('.nd2')[0]+'_vals.csv'
     dft = pd.read_csv(os.path.join(valsdir, valsf), index_col=0)
+    for col in sample.index:
+        dft[col] = sample[col]
     dflist.append(dft)
 df = pd.concat(dflist)
-print(df)
+df.to_csv(os.path.join(epath, 'consolidated.csv'))

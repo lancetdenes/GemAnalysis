@@ -18,6 +18,7 @@ def track_gem(gem_file, nuc_file=None, minmass=100., rate=100, pixel_size=0.1833
     pixel_size = different pixel size dependent on the microscope
     '''
     print('INITIALIZE: gem tracking pipline track_gems_v2 on %s'%gem_file)
+    cytoflag=False
     base_path,prefix = os.path.split(gem_file)
     base_path = os.path.split(base_path)[0]
     print(base_path)    
