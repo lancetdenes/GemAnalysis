@@ -43,7 +43,10 @@ def track_gem(gem_file, nuc_file=None, minmass=100., rate=100, pixel_size=0.1833
             nuc_mask = imread(nuc_file)
             raw_tracks.loc[nuc_mask[raw_tracks['y'].astype(int), raw_tracks['x'].astype(int)] > 0, 'compartment'] = 'nuc'
         except:
-            print('\n\n\n______\nno nuc masks! cyto only for this sample: ', prefix,'\n\n\n\n_______\n')
+            print('\n\n\n______\nno nuc masks! cyto only for this sample: ', prefix,'\n_______\n\n\n')
+            cytoflag = True
+    else:
+        cytoflag = True
     tracks = tp.filter_stubs(raw_tracks, 11)
 
     #comput the imsd for each track and combine them into a single dataframe from which a summary statsistic can be derived and tracks can be labeled
@@ -54,7 +57,7 @@ def track_gem(gem_file, nuc_file=None, minmass=100., rate=100, pixel_size=0.1833
     for column in imsd.columns:
         #print(imsd[column][:fit_lag]) excessive print statements
         t = tp.utils.fit_powerlaw(imsd[column][:fit_lag], plot=False)
-        t['d_eff'] = linregress(imsd[column].index[:fit_lag], imsd[column].iloc[:fit_lag]).slope/4
+        t['lin_Deff'] = linregress(imsd[column].index[:fit_lag], imsd[column].iloc[:fit_lag]).slope/4
         a.append(t)
     a = pd.concat(a)
 
@@ -65,28 +68,31 @@ def track_gem(gem_file, nuc_file=None, minmass=100., rate=100, pixel_size=0.1833
     grouped = tracks.groupby('particle')
     for (z,(n,dft)) in zip(a.index, grouped):
         dft['alpha'] = a.loc[z]['n']
-        dft['D'] = a.loc[z]['A']/4
-        dft['d_eff'] = a.loc[z]['d_eff']
+        dft['Deff'] = a.loc[z]['A']/4
+        dft['lin_Deff'] = a.loc[z]['lin_Deff']
         dft['track_length'] = len(dft)
         dft['avg_mas'] = dft['mass'].mean()
         df_list.append(dft)
     tracks = pd.concat(df_list)
 
     #calculate ensemble values for each compartment
-    em_nuc = tp.emsd(tracks[tracks['compartment'] == 'nuc'], pixel_size, rate)
     em_cyto = tp.emsd(tracks[tracks['compartment'] == 'cyto'], pixel_size, rate)
-    nuc_vals = tp.utils.fit_powerlaw(em_nuc.iloc[:10], plot=False)
     cyto_vals = tp.utils.fit_powerlaw(em_cyto.iloc[:10], plot=False)
     cyto_deff = linregress(em_cyto.index[:fit_lag], em_cyto.iloc[:fit_lag]).slope/4
-    nuc_deff = linregress(em_nuc.index[:fit_lag], em_nuc.iloc[:fit_lag]).slope/4
-    nuc_vals['lin_Deff'] = nuc_deff
     cyto_vals['lin_Deff'] = cyto_deff
-    nuc_vals['compartment'] = 'nuc'
     cyto_vals['compartment'] = 'cyto'
-    vals = pd.concat([nuc_vals, cyto_vals])
+    if not cytoflag:
+        em_nuc = tp.emsd(tracks[tracks['compartment'] == 'nuc'], pixel_size, rate)
+        nuc_vals = tp.utils.fit_powerlaw(em_nuc.iloc[:10], plot=False)
+        nuc_deff = linregress(em_nuc.index[:fit_lag], em_nuc.iloc[:fit_lag]).slope/4
+        nuc_vals['lin_Deff'] = nuc_deff
+        nuc_vals['compartment'] = 'nuc'
+        vals = pd.concat([nuc_vals, cyto_vals])
+    else: 
+        vals = cyto_vals
     print(vals.columns)
     vals.columns = ['alpha', 'Deff', 'lin_Deff', 'compartment']
-    vals.index = [1, 2]
+    vals = vals.reset_index(drop=True)
     vals['Deff'] = vals['Deff']/4
     print(vals)
 
