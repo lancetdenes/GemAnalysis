@@ -10,7 +10,11 @@ df = pd.read_csv(os.path.join(epath, 'file_list.csv'), index_col=0)
 dflist = []
 for n,sample in df.iterrows():
     valsf = sample['gem_file'].split('.nd2')[0]+'_vals.csv'
-    dft = pd.read_csv(os.path.join(valsdir, valsf), index_col=0)
+    try:
+        dft = pd.read_csv(os.path.join(valsdir, valsf), index_col=0)
+    except:
+        print('data not found for: ', sample)
+        continue
     for col in sample.index:
         dft[col] = sample[col]
     dflist.append(dft)

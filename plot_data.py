@@ -32,14 +32,22 @@ for col in df.columns:
     if 'field' in col:
         fields.append(col)
 
-if x:   
-    for n, field in enumerate(fields):
+if x:
+    if len(fields) > 0:
+        for n, field in enumerate(fields):
+            fig,ax = plt.subplots(figsize=(10,5))
+            sns.swarmplot(data=df[df['compartment']=='nuc'], y='Deff', x=x, hue=field, dodge=True, s=3)#, hue_order=['c0','c1','c2','c3','c4','c5','c6','c7'],ax=ax, s=3,dodge=True)#err_style="bars",order=['T0', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9'], ax=ax)
+            ax.legend(fontsize=6, frameon=False)
+            if '/' in field:
+                field = '.'.join(field.split('/'))
+            plt.savefig('%s_%s.png'%(experiment, field))
+    else:
         fig,ax = plt.subplots(figsize=(10,5))
-        sns.swarmplot(data=df[df['compartment']=='nuc'], y='Deff', x=x, hue=field, dodge=True, s=3)#, hue_order=['c0','c1','c2','c3','c4','c5','c6','c7'],ax=ax, s=3,dodge=True)#err_style="bars",order=['T0', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9'], ax=ax)
+        df = df[(df['laserpower'] == '100power') & (df['time'] == '4hr')] #(df['exposure'] == '10ms') & 
+        print(df['laserpower'])
+        sns.swarmplot(data=df[df['compartment']=='nuc'], y='Deff', x='substrate', hue='exposure', dodge=True, s=3)#, hue_order=['c0','c1','c2','c3','c4','c5','c6','c7'],ax=ax, s=3,dodge=True)#err_style="bars",order=['T0', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9'], ax=ax)
         ax.legend(fontsize=6, frameon=False)
-        if '/' in field:
-            field = '.'.join(field.split('/'))
-        plt.savefig('%s_%s.png'%(experiment, field))
+        plt.savefig('%s.png'%(experiment))
 else:
     print(df)
 
