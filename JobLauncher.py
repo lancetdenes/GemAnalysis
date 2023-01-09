@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def launch_gem_job(nuc_file, model_path, gem_file):
-    cmd = 'python segment_nuc_v2.py --nuc_file %s --modelpath %s\npython track_gems_v2.py --gem_file %s --nuc_file %s'%(nuc_file, model_path, gem_file, nuc_file)
+    cmd = 'python SegmentNuc.py --nuc_file %s --modelpath %s\npython TrackGEMs.py --gem_file %s --nuc_file %s'%(nuc_file, model_path, gem_file, nuc_file)
     scriptOptions = {'jobname':'track_nuc_gems','time':'12:00:00','partition':'cpu_short','mem-per-cpu':'2gb', 'cpus-per-task':'4', 'gres':'0'}
     Mysbatch_.launchJob(cmd,scriptOptions)
 
