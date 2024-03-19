@@ -9,6 +9,7 @@ def segment_nuc(nuc_file, model=None, modelpath=None, tif=False, channel=0):
     print('INITIALIZE: nucleus segmentation pipeline segment_nuc_v2.py on %s'%nuc_file)
     base_path, prefix = os.path.split(nuc_file)
     base_path,rawdata_path = os.path.split(base_path)
+    print('Base path: %s'%base_path)
     if not tif:
         with ND2Reader(nuc_file) as frames:
             nuc_image = frames.get_frame(channel)
@@ -63,3 +64,4 @@ if __name__ == '__main__':
         segment_nuc(nuc_file=args.nuc_file, model=model, tif=args.tif)
     else:
         print('need to provide model path!')
+    
