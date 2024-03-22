@@ -9,6 +9,7 @@ import os
 from cellpose import models,io
 from skimage.io import imread
 from scipy.stats import linregress
+import skimage as sk
 
 def track_gem(gem_file, nuc_file=None, minmass=100., rate=100, pixel_size=0.1833333, spot_size=9, tif=False):
     '''
@@ -42,16 +43,19 @@ def track_gem(gem_file, nuc_file=None, minmass=100., rate=100, pixel_size=0.1833
             nuc_file = os.path.join(base_path,'png_masks', nuc_prefix+'_cp_masks.png')
             print(nuc_file)
             nuc_mask = imread(nuc_file)
+            nuc_label = sk.measure.label(nuc_mask)
+            raw_tracks['nucleus'] = nuc_label[raw_tracks['y'].astype(int), raw_tracks['x'].astype(int)]
             raw_tracks.loc[nuc_mask[raw_tracks['y'].astype(int), raw_tracks['x'].astype(int)] > 0, 'compartment'] = 'nuc'
+
         except:
             print('\n\n\n______\nno nuc masks! cyto only for this sample: ', prefix,'\n_______\n\n\n')
             cytoflag = True
     else:
         cytoflag = True
-    tracks = tp.filter_stubs(raw_tracks, 11)
+    tracks = tp.filter_stubs(raw_tracks, 4) #changed this to 4, can filter more later on
 
     #comput the imsd for each track and combine them into a single dataframe from which a summary statsistic can be derived and tracks can be labeled
-    imsd = tp.motion.imsd(tracks, pixel_size, rate).iloc[:10,:]
+    imsd = tp.motion.imsd(tracks, pixel_size, rate).iloc[:3,:] #this number needs to be one less than the filterstubs number
     print(imsd)
     a=[]
     fit_lag = 10
@@ -109,7 +113,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--gem_file')
     parser.add_argument('--nuc_file', default=None, help='add nucfile or not')
-    parser.add_argument('--minmass', default=100., type=float, help='minmass parameter for trackpy')
+    parser.add_argument('--minmass', default=80., type=float, help='minmass parameter for trackpy, changed to 90 for better results')
     parser.add_argument('--rate', default=100, type=float, help='frame rate in frames per second')
     parser.add_argument('--pixel_size', default=0.1833333, type=float, help='pixel size in um per pixel from microscope, this default is for holt lab nikon new spinning disk ')
     parser.add_argument('--spot_size', default=9, type=int, help='spot size for trackpy')
