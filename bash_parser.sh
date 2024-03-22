@@ -13,13 +13,13 @@ for subdir in "$base_dir"/*; do
     # Check if it's a directory
     if [ -d "$subdir" ]; then
         # Create "rawdata" subdirectory
-        #mkdir -p "$subdir/rawdata"
+        mkdir -p "$subdir/rawdata"
         
         # Move all files to "rawdata" subdirectory
-        #mv "$subdir"/* "$subdir/rawdata"
+        mv "$subdir"/* "$subdir/rawdata"
         
         # Run the python scripts on the subdirectory
-        #python ListFiles.py "$subdir" noplot
+        python ListFiles.py "$subdir" noplot
         python JobLauncher.py -e "$subdir"
     fi
 done
