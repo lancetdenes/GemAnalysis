@@ -123,6 +123,7 @@ def generate_flist(flist, fieldlen):
     
     columns_list = ['nuc_file', 'gem_file']
     for n,item in enumerate(fields):
+        print(n,item)
         if len(item) == 3 and item.isdigit():
             columns_list.append('sample')
         elif item.startswith('t') or item.startswith('T') or 'hr' in item:
@@ -136,6 +137,7 @@ def generate_flist(flist, fieldlen):
         else:
             columns_list.append('field_%s/%s'%(n+1,fieldlen))
     df = pd.DataFrame(sampledict).T
+    print(df)
     df.columns = columns_list
     return(df)
 
@@ -144,6 +146,7 @@ if len(naming_conv) != 1:
 
 df_list = []
 for key in fdict:
+    print(key)
     print('processing %s fields files'%key)
     dft = generate_flist(fdict[key], key)
     df_list.append(dft)

@@ -32,3 +32,19 @@ plotting scripts need fine tuning on a per experiment basis depending on various
 
 need to make napari launcher script once environment is set up appropriately 
 
+plotting_notebook was made to work on per nucleus functionality 
+
+3/25/24
+
+exported plotting_notebook to "track_processing.py" 
+    
+    feed this script a directory that contains subdirectories for each image set (can modify this to accept a single subdirectory)
+    The script will make all subsequent data directories on its own 
+    It will take the output tracks files from previous scripts and open original images and masks to make plots of images + tracks 
+    it will then split up the tracks on a per nucleus basis and save a file for each
+
+    Now, need to use a consolidation script to process each tracks file 
+
+
+
+Run the bash script to make the directories and run the python scripts to generate file list and start the jobs 
