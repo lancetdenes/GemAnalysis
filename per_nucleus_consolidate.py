@@ -37,8 +37,7 @@ def plot_tracks(df, cmap_name='viridis', save_path='fasttracks.png'):
 
     return track_len_list, diff_list
 
-
-path = '/gpfs/scratch/denesl01/projects/MSC_GEMs/20240206_GEM_plating_collagen_cell_density/'
+path = '/gpfs/scratch/denesl01/projects/MSC_GEMs/2024_GEM_clones/'
 exp_list = [f for f in os.listdir(path) if os.path.isdir(os.path.join(path, f))]
 full_exp = []
 for exp in exp_list:
@@ -64,10 +63,11 @@ for exp in exp_list:
         name = n[0] + '_' + n[1]
         temp.append([n[0], n[1], med, n_tracks])
     df = pd.DataFrame(temp, columns=['cell', 'condition', 'Deff', 'n_tracks'])
+    df['exp'] = exp
     full_exp.append(df)
 
 full_exp = pd.concat(full_exp)
-full_exp.to_csv('full_exp.csv')
+full_exp.to_csv('Clones_full_exp.csv')
 full_exp = full_exp[full_exp['n_tracks'] > 10]
 import seaborn as sns
 fig,ax=plt.subplots()
